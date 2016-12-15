@@ -1,0 +1,47 @@
+Introduction
+
+To manage its hardware service business, OCA uses two systems: SIS and MAIND.  SIS is a repository of master data and maintenance information whereas MAIND is a call taking system. 
+
+This document presents an analysis of the current system and architecture, proposed architectures,  issues and benefits of these and finally technical architecture.
+
+
+This is a manual process and does not permit real time availability of data across CE’s. This can be enhanced by one of the following ways. 
+1. Automate data transfer by a batch process.
+2. Automate data transfer by online replication 
+3. Integrate MAIND and SIS databases into one centralized MAIND+SIS database server. 
+
+The current system eases monitoring of work requests which were registered locally. But, 30-40% of the work requests are registered in a remote server.  As MAIND servers are not integrated, monitoring of these work requests is difficult.  Account managers of nationwide customers have requirement to monitor work progress across different MAIND servers.  With the existing architecture of MAIND, this can be achieved in one of the following ways: 
+
+1. The user can use MAIND web, by specifying the CE where the work is executed. This would work in a lot of cases. But, this puts the burden of knowing which CE is executing the work on the person who would like to monitor the work. Ideally, the person who is inquiring shouldn’t have to know which CE is executing the work.
+2. The user can sign on to the relevant MAIND server. This is more time consuming, if the MAIND system is not optimally designed for best performance over the WAN – for example a single transaction would involve several calls over the WAN.
+
+In the business flow agreed upon by the SIS working groups, the scheduling of work request, inspection and FCO (Field Change Order) will be done in SIS and will be transferred to MAIND overnight and work completion information will be transferred to SIS overnight. This leads to SIS not having the current information all the time. SIS will get the current information with a one day lag. This does not allow for automated real time workflow. This can be resolved either by online replication of completion information to SIS or by integrating MAIND and SIS. 
+
+Current Systems
+
+SIS is a server based system and runs on a UNIVAC 2000 machine.  MAIND has 13 O9000 based installations all over Japan.  There is a fair amount of data coupling between these two systems.  All master data is shared between SIS and MAIND.  Of the transaction data, once a request is serviced,  work completion data is transmitted to SIS.  
+
+All master data are replicated from SIS to MAIND servers through the Head Quarter NT server.  Additional information required in MAIND is maintained on the NT server using  MAIND web which is then transferred to the MAIND servers. 
+
+The work completion information from MAIND servers is copied to the SIS server using the following steps : 
+
+1. Using FD option in MAIND, an extract file is created by the call center.
+2. The extract file is mailed/uploaded to the Head Quarter server.
+3. From the Head Quarter server, the file is uploaded to the UNIVAC for SIS.
+
+Analysis of Data Sharing in Current Systems
+
+The following issues and problems are related to data sharing in the current scenario:
+
+
+To firm up an approach for data storage architecture,  it is important to analyze the degree of data sharing in the applications. The following table shows data sharing between the existing systems:
+
+
+Call taking and history data are managed by the MAIND server where call is taken, and Work slip information is managed by the MAIND server where work is actually performed.
+Work status and historical information are not available globally.
+Nation-wide users cannot view all their data from a single server/interface.
+Due to multiple copies of the master information inconsistencies result during addition, relocation and abolishment.
+Account managers cannot refer to work schedule and work progress which makes it difficult to schedule adjustment of work.
+Most of the data used by the systems are replicated. This leads to redundancy of data and wastage of disk storage space.
+Network related issues during replication cause inconsistency of data.
+Additional master information required by MAIND other than those replicated from SIS is to be maintained separately.
